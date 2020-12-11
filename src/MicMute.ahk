@@ -175,10 +175,13 @@ checkProfiles(){
 
 showFeedback(){
     if (current_profile.OnscreenFeedback){
-        if (global_mute)
+        if (global_mute) {
             OSD_spawn("Microphone Muted", OSD_RED_ACCENT, current_profile.ExcludeFullscreen)
-        else
+	    Progress, zh0 fs18 b ctred y0, Microphone Muted
+	} else {
             OSD_spawn("Microphone Online", OSD_BLUE_ACCENT, current_profile.ExcludeFullscreen)
+	    Progress, Off
+	}
     }
     if (current_profile.SoundFeedback){
         playSound(global_mute? mute_sound : unmute_sound)
