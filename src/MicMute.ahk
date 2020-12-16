@@ -173,14 +173,56 @@ checkProfiles(){
     }
 }
 
+Global progressMoved,x,y,x1,y1
+CoordMode Mouse, Screen
+deleteProgress()
+
+createProgress() {
+  showProgress(0)
+  WinGetPos, x, y, w, h, __micmute_ui_feedback__
+  x1:=x+w
+  y1:=y+h
+}
+
+deleteProgress() {
+   x:=-1
+   y:=-1
+   x1:=-1
+   y1:=-1
+   progressMoved:=0
+   Progress, Off
+}
+
+showProgress(position:=0){
+  Progress, zh0 fs18 b ctred y%position%, Microphone Muted, , __micmute_ui_feedback__
+}
+
+watchCursor(){	
+	MouseGetPos, mX, mY, id, control
+        if (mX>=x && mX<=x1 && mY>=y && mY<=y1) {
+	    if (progressMoved == 0) {
+		showProgress(100)
+                progressMoved = 1
+	    }
+	} else {
+	    if (progressMoved == 1) {
+		showProgress(0)
+                progressMoved = 0
+	    }
+	}
+}
+
 showFeedback(){
     if (current_profile.OnscreenFeedback){
         if (global_mute) {
             OSD_spawn("Microphone Muted", OSD_RED_ACCENT, current_profile.ExcludeFullscreen)
-	    Progress, zh0 fs18 b ctred y0, Microphone Muted
+	    ;Progress, zh0 fs18 b ctred y0, Microphone Muted
+	    createProgress()
+    	    SetTimer, watchCursor, 1000
 	} else {
             OSD_spawn("Microphone Online", OSD_BLUE_ACCENT, current_profile.ExcludeFullscreen)
-	    Progress, Off
+            SetTimer, watchCursor, -1
+	    deleteProgress()
 	}
     }
     if (current_profile.SoundFeedback){
